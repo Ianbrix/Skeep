@@ -1,0 +1,30 @@
+{
+  "overview": "SKeep is a comprehensive digital financial management system for SK Treasurers and SK Chairpersons in the Philippines. It covers transaction recording, budget management, COA compliance reporting, project tracking, receipt storage, supplier management, audit trails, and a subscription system — all in a professional, government-style interface.",
+  "features": [
+    "Role-based authentication (SK Treasurer & Chairperson)",
+    "Real-time financial dashboard with income/expense charts",
+    "Full transaction recording with check payment module",
+    "Annual budget setup and program allocation tracking",
+    "SK project management with document uploads",
+    "COA compliance center (QSRP, RAAF, ASRP, Budget vs Actual)",
+    "BIR & Supplier database with tax tracking",
+    "Receipt & document management with cloud storage",
+    "In-app notification center with budget and deadline alerts",
+    "Full audit trail and activity logging",
+    "About page with developer info",
+    "Subscription system with ₱99/month plan and GCash payment"
+  ],
+  "category": "finance",
+  "tags": [
+    "finance",
+    "government",
+    "sk",
+    "philippines",
+    "budgeting",
+    "coa",
+    "compliance",
+    "transactions",
+    "reporting"
+  ],
+  "last_updated": "2026-05-10T04:09:07.986Z"
+}

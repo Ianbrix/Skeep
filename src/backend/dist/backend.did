@@ -1,0 +1,362 @@
+type UserPublic = 
+ record {
+   createdAt: Timestamp;
+   email: text;
+   id: UserId;
+   isActive: bool;
+   lastActivity: Timestamp;
+   name: text;
+   role: Role;
+ };
+type UserId = nat;
+type TransactionType = 
+ variant {
+   cashAdvance;
+   expenses;
+   income;
+   projectExpenses;
+   reimbursement;
+ };
+type TransactionPublic = 
+ record {
+   amount: nat;
+   checkDetails: opt CheckDetailsPublic;
+   createdAt: Timestamp;
+   date: Timestamp;
+   description: text;
+   id: TransactionId;
+   paymentMethod: PaymentMethod;
+   projectId: opt ProjectId;
+   receiptId: opt DocumentId;
+   supplierId: opt SupplierId;
+   txType: TransactionType;
+   updatedAt: Timestamp;
+   userId: UserId;
+ };
+type TransactionId = nat;
+type TransactionFilter = 
+ record {
+   fromDate: opt Timestamp;
+   paymentMethod: opt PaymentMethod;
+   projectId: opt ProjectId;
+   toDate: opt Timestamp;
+   txType: opt TransactionType;
+ };
+type Timestamp = int;
+type SupportingDocPublic = 
+ record {
+   docType: text;
+   isSubmitted: bool;
+   linkedReportId: CoaReportId;
+ };
+type SupplierPublic = 
+ record {
+   address: text;
+   contactPerson: text;
+   createdAt: Timestamp;
+   id: SupplierId;
+   isVatRegistered: bool;
+   name: text;
+   phone: text;
+   tin: text;
+ };
+type SupplierId = nat;
+type SubscriptionStatus = 
+ variant {
+   active;
+   expired;
+   trial;
+ };
+type SubscriptionPublic = 
+ record {
+   amountPaid: nat;
+   planName: text;
+   status: SubscriptionStatus;
+   subscriptionEndDate: opt Timestamp;
+   subscriptionStartDate: opt Timestamp;
+   trialStartDate: opt Timestamp;
+   userId: UserId;
+ };
+type Role = 
+ variant {
+   chairperson;
+   treasurer;
+ };
+type PurchaseId = nat;
+type Purchase = 
+ record {
+   amount: nat;
+   date: Timestamp;
+   description: text;
+   purchaseId: PurchaseId;
+   supplierId: SupplierId;
+   transactionId: TransactionId;
+ };
+type ProjectStatus = 
+ variant {
+   completed;
+   ongoing;
+   planning;
+ };
+type ProjectPublic = 
+ record {
+   budgetAllocation: nat;
+   createdAt: Timestamp;
+   description: text;
+   endDate: opt Timestamp;
+   id: ProjectId;
+   name: text;
+   startDate: Timestamp;
+   status: ProjectStatus;
+   totalExpenses: nat;
+   updatedAt: Timestamp;
+ };
+type ProjectId = nat;
+type PaymentMethod = 
+ variant {
+   bankTransfer;
+   cash;
+   check;
+   gcash;
+ };
+type NotificationType = 
+ variant {
+   budgetAlert;
+   coaDeadline;
+   missingReceipt;
+   pendingApproval;
+   subscriptionReminder;
+ };
+type NotificationPublic = 
+ record {
+   createdAt: Timestamp;
+   id: NotificationId;
+   isRead: bool;
+   message: text;
+   notifType: NotificationType;
+   title: text;
+   userId: UserId;
+ };
+type NotificationId = nat;
+type LoginResult = 
+ variant {
+   err: text;
+   ok: record {
+         token: text;
+         user: UserPublic;
+       };
+ };
+type DocumentId = nat;
+type Document = 
+ record {
+   fileName: text;
+   fileType: text;
+   id: DocumentId;
+   linkedProjectId: opt ProjectId;
+   linkedTransactionId: opt TransactionId;
+   storageKey: text;
+   uploadedAt: Timestamp;
+   uploadedBy: UserId;
+ };
+type CreateUserResult = 
+ variant {
+   err: text;
+   ok: UserPublic;
+ };
+type CoaReportType = 
+ variant {
+   asrp;
+   budgetVsActual;
+   inventoryReport;
+   notesToFS;
+   qsrp;
+   raaf;
+ };
+type CoaReportStatus = 
+ variant {
+   approved;
+   draft;
+   needsRevision;
+   pendingReview;
+   submitted;
+ };
+type CoaReportPublic = 
+ record {
+   createdAt: Timestamp;
+   deadline: opt Timestamp;
+   fiscalYear: nat;
+   id: CoaReportId;
+   notes: text;
+   quarter: opt nat;
+   reportType: CoaReportType;
+   status: CoaReportStatus;
+   submittedAt: opt Timestamp;
+ };
+type CoaReportId = nat;
+type CheckStatus = 
+ variant {
+   cancelled;
+   cleared;
+   issued;
+   pendingIssuance;
+ };
+type CheckDetailsPublic = 
+ record {
+   bankName: text;
+   checkDate: Timestamp;
+   checkNumber: opt text;
+   payee: text;
+   purpose: text;
+   status: CheckStatus;
+ };
+type Budget = 
+ record {
+   fiscalYear: nat;
+   totalBudget: nat;
+ };
+type AuditLogId = nat;
+type AuditLog = 
+ record {
+   action: AuditAction;
+   description: text;
+   id: AuditLogId;
+   timestamp: Timestamp;
+   userEmail: text;
+   userId: UserId;
+ };
+type AuditFilter = 
+ record {
+   action: opt AuditAction;
+   fromDate: opt Timestamp;
+   toDate: opt Timestamp;
+   userId: opt UserId;
+ };
+type AuditAction = 
+ variant {
+   addTransaction;
+   deleteTransaction;
+   editTransaction;
+   generateReport;
+   login;
+   other;
+ };
+type AllocationPublic = 
+ record {
+   allocatedAmount: nat;
+   id: AllocationId;
+   name: text;
+   spentAmount: nat;
+ };
+type AllocationId = nat;
+type AddTransactionInput = 
+ record {
+   amount: nat;
+   checkDetails: opt CheckDetailsPublic;
+   date: Timestamp;
+   description: text;
+   paymentMethod: PaymentMethod;
+   projectId: opt ProjectId;
+   receiptId: opt DocumentId;
+   supplierId: opt SupplierId;
+   txType: TransactionType;
+ };
+type AddProjectInput = 
+ record {
+   budgetAllocation: nat;
+   description: text;
+   endDate: opt Timestamp;
+   name: text;
+   startDate: Timestamp;
+ };
+service : {
+  activateSubscription: (userId: UserId, endDate: Timestamp, amountPaid:
+   nat) -> (opt SubscriptionPublic);
+  addAllocation: (name: text, amount: nat) -> (AllocationPublic);
+  addAuditLog: (userId: UserId, userEmail: text, action: AuditAction,
+   description: text) -> (AuditLog);
+  addCoaReport: (reportType: CoaReportType, fiscalYear: nat, quarter:
+   opt nat, deadline: opt Timestamp) -> (CoaReportPublic);
+  addDocument: (fileName: text, fileType: text, uploadedBy: UserId,
+   linkedTransactionId: opt TransactionId, linkedProjectId: opt ProjectId,
+   storageKey: text) -> (Document);
+  addNotification: (userId: UserId, notifType: NotificationType, title: 
+   text, message: text) -> (NotificationPublic);
+  addProject: (input: AddProjectInput) -> (ProjectPublic);
+  addPurchase: (supplierId: SupplierId, transactionId: TransactionId, amount:
+   nat, date: Timestamp, description: text) -> (Purchase);
+  addSupplier: (name: text, tin: text, isVatRegistered: bool, contactPerson:
+   text, phone: text, address: text) -> (SupplierPublic);
+  addTransaction: (input: AddTransactionInput, userId: UserId) ->
+   (TransactionPublic);
+  checkSubscriptionStatus: (userId: UserId) -> (opt SubscriptionStatus) query;
+  createSubscription: (userId: UserId, planName: text, startAsTrial: 
+   bool) -> (SubscriptionPublic);
+  createUser: (email: text, passwordHash: text, name: text, role: Role) ->
+   (CreateUserResult);
+  deleteAllocation: (id: AllocationId) -> (bool);
+  deleteDocument: (id: DocumentId) -> (bool);
+  deleteProject: (id: ProjectId) -> (bool);
+  deleteSupplier: (id: SupplierId) -> (bool);
+  deleteTransaction: (id: TransactionId) -> (bool);
+  dismissNotification: (id: NotificationId) -> (bool);
+  expireSubscription: (userId: UserId) -> (opt SubscriptionPublic);
+  getActiveProjectsCount: () -> (nat) query;
+  getAllocations: () -> (vec AllocationPublic) query;
+  getAuditLogs: (filter: opt AuditFilter) -> (vec AuditLog) query;
+  getBudget: () -> (opt Budget) query;
+  getCoaReports: () -> (vec CoaReportPublic) query;
+  getDashboardSummary: () ->
+   (record {
+      activeProjectsCount: nat;
+      remainingBalance: opt nat;
+      totalBudget: opt nat;
+      totalExpenses: nat;
+      totalIncome: nat;
+    }) query;
+  getDocumentById: (id: DocumentId) -> (opt Document) query;
+  getDocuments: () -> (vec Document) query;
+  getDocumentsByProject: (projectId: ProjectId) -> (vec Document) query;
+  getDocumentsByTransaction: (transactionId: TransactionId) ->
+   (vec Document) query;
+  getNotifications: (userId: UserId) -> (vec NotificationPublic) query;
+  getOverdueReports: () -> (vec CoaReportPublic) query;
+  getProjectById: (id: ProjectId) -> (opt ProjectPublic) query;
+  getProjects: () -> (vec ProjectPublic) query;
+  getPurchasesBySupplier: (supplierId: SupplierId) -> (vec Purchase) query;
+  getRecentLogs: (limit: nat) -> (vec AuditLog) query;
+  getRemainingBalance: () -> (opt nat) query;
+  getSubscription: (userId: UserId) -> (opt SubscriptionPublic) query;
+  getSupplierById: (id: SupplierId) -> (opt SupplierPublic) query;
+  getSuppliers: () -> (vec SupplierPublic) query;
+  getSupportingDocs: (reportId: CoaReportId) ->
+   (vec SupportingDocPublic) query;
+  getTotalExpenses: () -> (nat) query;
+  getTotalIncome: () -> (nat) query;
+  getTransactionById: (id: TransactionId) -> (opt TransactionPublic) query;
+  getTransactions: (filter: opt TransactionFilter) ->
+   (vec TransactionPublic) query;
+  getUnreadCount: (userId: UserId) -> (nat) query;
+  getUserById: (id: UserId) -> (opt UserPublic) query;
+  getUserByToken: (token: text) -> (opt UserPublic) query;
+  login: (email: text, passwordHash: text) -> (LoginResult);
+  logout: (token: text) -> (bool);
+  markAsRead: (id: NotificationId) -> (bool);
+  setBudget: (totalBudget: nat, fiscalYear: nat) -> (Budget);
+  submitSupportingDoc: (reportId: CoaReportId, docType: text) -> (bool);
+  updateAllocation: (id: AllocationId, name: text, amount: nat) ->
+   (opt AllocationPublic);
+  updateCoaReport: (id: CoaReportId, status: CoaReportStatus, notes: 
+   text) -> (opt CoaReportPublic);
+  updateProject: (id: ProjectId, input: AddProjectInput) ->
+   (opt ProjectPublic);
+  updateProjectStatus: (id: ProjectId, status: ProjectStatus) ->
+   (opt ProjectPublic);
+  updateSubscription: (userId: UserId, status: SubscriptionStatus,
+   subscriptionEndDate: opt Timestamp, amountPaid: nat) ->
+   (opt SubscriptionPublic);
+  updateSupplier: (id: SupplierId, name: text, tin: text, isVatRegistered:
+   bool, contactPerson: text, phone: text, address: text) ->
+   (opt SupplierPublic);
+  updateTransaction: (id: TransactionId, input: AddTransactionInput) ->
+   (opt TransactionPublic);
+}
